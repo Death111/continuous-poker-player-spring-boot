@@ -4,7 +4,6 @@ import org.continuouspoker.player.model.*;
 
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class Strategy {
 
@@ -17,11 +16,11 @@ public class Strategy {
         List<Card> communityCards = table.getCommunityCards();
         Player me = table.getPlayers().get(table.getActivePlayer());
 
-        List<Card> cards = communityCards;
-        cards.addAll(me.getCards());
+        List<Card> allCards = communityCards;
+        allCards.addAll(me.getCards());
 
-        HashMap<Suit, Integer> suitIntegerHashMap = countSuits(cards);
-        HashMap<Rank, Integer> rankIntegerHashMap = countRanks(cards);
+        HashMap<Suit, Integer> suitIntegerHashMap = countSuits(allCards);
+        HashMap<Rank, Integer> rankIntegerHashMap = countRanks(allCards);
 
         List<Integer> top2List = rankIntegerHashMap.values().stream().sorted(Comparator.reverseOrder()).limit(2).collect(Collectors.toList());
 
@@ -29,14 +28,60 @@ public class Strategy {
         Integer top1 = top2List.get(0);
         Integer top2 = top2List.get(1);
 
-        if (top1 >= 2) {
+        if (top1 >= 2) { // pair/tripple/quad
             bet = top1 * 10;
         }
-        if (top1 == 3 && top2 == 2) { // FUll house
+        if (isFullHouse(top1, top2)) { // FUll house
             bet = me.getStack();
+        }
+        if (isStraight(allCards.stream().map(card -> card.getRank()).collect(Collectors.toSet()))) {
+            bet = me.getStack() / 2;
         }
 
         return new Bet().bet(bet);
+    }
+
+
+    static Map<Rank, Integer> cardOrderMap = new HashMap<>();
+
+    static {
+        cardOrderMap.put(Rank._2, 2);
+        cardOrderMap.put(Rank._3, 3);
+        cardOrderMap.put(Rank._4, 4);
+        cardOrderMap.put(Rank._5, 5);
+        cardOrderMap.put(Rank._6, 6);
+        cardOrderMap.put(Rank._7, 7);
+        cardOrderMap.put(Rank._8, 8);
+        cardOrderMap.put(Rank._9, 9);
+        cardOrderMap.put(Rank._10, 10);
+        cardOrderMap.put(Rank.J, 11);
+        cardOrderMap.put(Rank.Q, 12);
+        cardOrderMap.put(Rank.K, 13);
+        cardOrderMap.put(Rank.A, 14);
+    }
+
+    public boolean isStraight(Set<Rank> collect) {
+
+        List<Integer> collect1 = collect.stream().map(rank -> cardOrderMap.get(rank)).sorted().collect(Collectors.toList());
+
+        int followingCount = 0;
+        int lastRank = -1;
+        for (int i : collect1) {
+            if (followingCount == 5) return true;
+
+            lastRank = i;
+            if (i != lastRank + 1) {
+                followingCount = 0;
+            } else {
+                followingCount++;
+            }
+        }
+
+        return followingCount == 5;
+    }
+
+    private static boolean isFullHouse(Integer top1, Integer top2) {
+        return top1 == 3 && top2 == 2;
     }
 
     public HashMap<Rank, Integer> countRanks(List<Card> cards) {
