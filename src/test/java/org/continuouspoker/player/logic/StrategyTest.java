@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.lang.reflect.Array;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -18,7 +19,12 @@ class StrategyTest {
     void decide() {
         // ARRANGE
         Table table = new Table();
+        Player player = new Player();
+        player.setCards(Arrays.asList(cardFrom(Rank.A), cardFrom(Rank._5)));
 
+        table.setPlayers(Arrays.asList(player));
+        table.setActivePlayer(0);
+        table.setRound(0);
         // ACT
         Bet bet = strategy.decide(table);
 
@@ -52,13 +58,35 @@ class StrategyTest {
 
     @Test
     void asd() {
-        List<Integer> a = Arrays.asList(4,2,1,99);
+        List<Integer> a = Arrays.asList(4, 2, 1, 99);
 
         List<Integer> asd = a.stream().sorted(Comparator.reverseOrder()).limit(2).collect(Collectors.toList());
         System.out.println(asd);
     }
 
-    private Card cardFrom(Rank rank, Suit suit){
+    @Test
+    void straight() {
+        Set<Rank> cards = new HashSet<>();
+        cards.add(Rank._2);
+        cards.add(Rank._3);
+        cards.add(Rank._4);
+        cards.add(Rank._5);
+        cards.add(Rank._6);
+
+        boolean isStraight = strategy.isStraight(cards);
+
+        assertEquals(true, isStraight);
+    }
+
+
+    private Card cardFrom(Rank rank) {
+        Card card = new Card();
+        card.rank(rank);
+        card.suit(Suit.CLUBS);
+        return card;
+    }
+
+    private Card cardFrom(Rank rank, Suit suit) {
         Card card = new Card();
         card.rank(rank);
         card.suit(suit);
