@@ -2,9 +2,9 @@ package org.continuouspoker.player.logic;
 
 import org.continuouspoker.player.model.*;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class Strategy {
 
@@ -20,19 +20,20 @@ public class Strategy {
         List<Card> cards = communityCards;
         cards.addAll(me.getCards());
 
+        HashMap<Suit, Integer> suitIntegerHashMap = countSuits(cards);
         HashMap<Rank, Integer> rankIntegerHashMap = countRanks(cards);
 
-        HashMap<Suit, Integer> suitIntegerHashMap = countSuits(cards);
+        List<Integer> top2List = rankIntegerHashMap.values().stream().sorted(Comparator.reverseOrder()).limit(2).collect(Collectors.toList());
 
-        int highestRankCount = 0;
-        for (Rank rank : rankIntegerHashMap.keySet()) {
-            Integer rankCount = rankIntegerHashMap.get(rank);
-            if (rankCount > highestRankCount) highestRankCount = rankCount;
-        }
-        
         int bet = 0;
-        if (highestRankCount >= 2) {
-            bet = highestRankCount * 10;
+        Integer top1 = top2List.get(0);
+        Integer top2 = top2List.get(1);
+
+        if (top1 >= 2) {
+            bet = top1 * 10;
+        }
+        if (top1 == 3 && top2 == 2) { // FUll house
+            bet = me.getStack();
         }
 
         return new Bet().bet(bet);

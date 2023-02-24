@@ -6,10 +6,8 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Disabled
 class StrategyTest {
@@ -50,6 +48,14 @@ class StrategyTest {
         HashMap<Suit, Integer> countedRanks = strategy.countSuits(cards);
 
         assertEquals(2, countedRanks.get(Suit.CLUBS));
+    }
+
+    @Test
+    void asd() {
+        List<Integer> a = Arrays.asList(4,2,1,99);
+
+        List<Integer> asd = a.stream().sorted(Comparator.reverseOrder()).limit(2).collect(Collectors.toList());
+        System.out.println(asd);
     }
 
     private Card cardFrom(Rank rank, Suit suit){
