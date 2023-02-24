@@ -28,6 +28,13 @@ public class Strategy {
         Integer top1 = top2List.get(0);
         Integer top2 = top2List.get(1);
 
+        if (table.getRound() == 0) {
+            int cardRanks = cardOrderMap.get(me.getCards().get(0).getRank());
+            cardRanks += cardOrderMap.get(me.getCards().get(1).getRank());
+            if (cardRanks >= 25)
+                return new Bet().bet(table.getMinimumBet());
+        }
+
         if (top1 >= 2) { // pair/tripple/quad
             bet = top1 * 10;
         }
