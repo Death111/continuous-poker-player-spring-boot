@@ -69,12 +69,13 @@ public class Strategy {
         for (int i : collect1) {
             if (followingCount == 5) return true;
 
-            lastRank = i;
+
             if (i != lastRank + 1) {
-                followingCount = 0;
+                followingCount = 1;
             } else {
                 followingCount++;
             }
+            lastRank = i;
         }
 
         return followingCount == 5;
